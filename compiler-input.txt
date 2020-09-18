@@ -1,0 +1,30 @@
+science {physics #important, chemistry, biology}
+
+biology {plants}
+
+plants -R.capable_of> photosynthesis
+
+photosynthesis {
+    carbon_fixation >> 
+    reduction_phase >> 
+    carbohydrate_formation >> 
+    regeneration_formation /repeat
+}
+
+carbon_fixation {
+    - G3P turned into carbohydrates (sugars)
+}
+
+plants {
+    flower,
+    fruit,
+    seed,
+    leaf,
+    stem,
+    shoot {flower, fruit, seed, leaf, stem},
+    root
+}
+
+cells {
+    - structure {cell_wall, nucleus}
+}

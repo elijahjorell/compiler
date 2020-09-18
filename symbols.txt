@@ -1,0 +1,15 @@
+characteristics
+- information bullet point (consider whatever is right of it as text UNLESS right of it's a single word followed by a {})
+# tag
+! important
+
+relationships
+-- undirected relationship
+-> directed relationship
+>> left is before right
+{} left encapsulates right or whatever is inside
+== left and right are equal
+
+modifiers
+/ option
+, next
