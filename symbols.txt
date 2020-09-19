@@ -10,6 +10,13 @@ relationships
 {} left encapsulates right or whatever is inside
 == left and right are equal
 
+ 
+
 modifiers
 / option
 , next
+: multiply relationship e.g: !!!! MIGHT BE REDUNDANT
+    a -better than>: {b, c} is the same as a is better than b and c
+    {b, c} :-better than> is the same as b and c are better than a
+    {a, b} :-better than> {b, c}
+

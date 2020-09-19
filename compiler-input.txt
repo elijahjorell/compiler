@@ -28,3 +28,9 @@ plants {
 cells {
     - structure {cell_wall, nucleus}
 }
+
+{plants, plants.{}} :-R.composed_of> cells
+
+{plants, animals, bacteria, viruses} :-- life
+
+forks --: {spoons, knives #sharp}
