@@ -1,0 +1,13 @@
+science {physics, chemistry, biology}
+
+biology {plants}
+
+plants -R.capable_of> photosynthesis
+
+photosynthesis {
+        carbon_fixation,
+        reduction_phase,
+        carbohydrate_formation,
+        regeneration_formation,
+        carbon_fixation,
+}

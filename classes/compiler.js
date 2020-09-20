@@ -1,6 +1,16 @@
-`
-1. split into lines
-2. combine into chunks
-3. run each chunk (separate codes within)
+class Compiler {
+    constructor() {
+        this.stack = [];
+    }
+    clean(raw) {
+        return raw 
+            .split('\r')
+            .map((line) => line.replace(/\n/g, ''));
+    }
+    compile(cleaned) {
+        
+        // expect
+    }
+}
 
-`
+module.exports = Compiler;
