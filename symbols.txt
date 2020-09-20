@@ -5,8 +5,12 @@ characteristics
 relationships
 -- undirected relationship
 -> directed relationship
-{} left encapsulates right or whatever is inside
 
+encapsulants
+{} left encapsulates right or whatever is inside
+'' inside is text
+
+definition
 : right defines left
 
 modifiers

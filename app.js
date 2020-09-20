@@ -18,11 +18,26 @@ console.log(input
     .filter((line) => line != '')
     .reduce((data, line, row) => {
         line.split('').map((char, col) => {
-            if (char === '{' || char === '}') {
-                data.brackets.push({ type: char, row: row, col: col });
+            if (char === '{') {
+                data.openBrackets.unshift({ row: row, col: col });  
+            } else if (char === '}') {
+                data.chunk.start = data.openBrackets.shift();
+                data.chunk.end = { row: row, col: col };
+                data.chunks.push(data.chunk)
             }
         });
-        data.chunks.push(line);
-        return data
-    }, { chunks: [], brackets: [] })
-)
+
+        return data;
+    }, { openBrackets: [], chunk: { start: undefined, end: undefined }, chunks: [] }).chunks
+);
+
+/*
+    check for {}, 
+        if none, process as single line, 
+        if yes, check for }, 
+            if none, process as multi line
+            if yes, process as tiered single line 
+
+
+    
+*/

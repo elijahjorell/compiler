@@ -5,14 +5,25 @@ biology {plants}
 plants -R.capable_of> photosynthesis
 
 photosynthesis {
-    carbon_fixation >> 
-    reduction_phase >> 
-    carbohydrate_formation >> 
-    regeneration_formation /repeat
+    - process: {
+        carbon_fixation ->
+        reduction_phase -> 
+        carbohydrate_formation -> 
+        regeneration_formation -> 
+        carbon_fixation
+    }
 }
 
 carbon_fixation {
-    - G3P turned into carbohydrates (sugars)
+    - G3P turned into carbohydrates (sugars),
+    ! appeared in 2 past exams
+}
+
+plants {
+    -- animals,
+    -- humans,
+    -- bugs,
+    -- oxygen
 }
 
 plants {
@@ -26,11 +37,50 @@ plants {
 }
 
 cells {
-    - structure {cell_wall, nucleus}
+    - structure: {cell_wall, nucleus}
 }
 
-{plants, plants.{}} :-R.composed_of> cells
+humans -use> {forks, knives, spoons}
 
-{plants, animals, bacteria, viruses} :-- life
+ben
+bob
+brad
 
-forks --: {spoons, knives #sharp}
+ben {
+    - age: 28,
+    - height: 178 cm,
+    - spouse: none,
+    - children: none
+}
+
+work [
+    ben -boss of> bob,
+    ben -boss of> brad,
+    bob -co workers- brad 
+]
+
+football [
+    bob -captain of> ben
+]
+
+car {
+    - age: '24',
+    - parts: {
+        engine {
+            pistons {
+                gear
+            },
+            clutch,
+        },
+        windshield {
+            wiper
+        },
+        chassis
+    },
+    -- motorbikes,
+    -- buses,
+}
+
+
+
+// check each line, adding { to store, set chunk end to line when all outstanding { close
