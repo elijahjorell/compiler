@@ -5,31 +5,18 @@ const fs = require('fs');
 var program = fs.readFileSync('./program.txt', 'utf-8');
 
 program.split('').reduce((scanner, char) => {
-    if (char.match(/\r/)) {
-        scanner.col = 1;
-        scanner.line++;
-        scanner.token.val = '';
-    } else if (!char.match(/\n|\r/)) {
-        if (char.match(/[a-z]|_/)) {
-            scanner.token.val += char;
-        } else {
-            if (scanner.token.val !== '') {
-                console.log(scanner.token.val, scanner.line, scanner.col);
-                scanner.token.val = '';
-            }
-            
-            if (char === '{') {
-                console.log(char, scanner.line, scanner.col);
-            } else if (char ==='}') {
-                console.log(char, scanner.line, scanner.col);
-            } else if (char === ',') {
-                console.log(char, scanner.line, scanner.col);
-            }
-        }
+    if (char.match(/[ -{}',>]/)) {
+        console.log('special', char, scanner.line, scanner.col);
         scanner.col++;
+    } else if (char.match(/[a-z]|_/)) {
+        console.log('alpha', char, scanner.line, scanner.col);
+        scanner.col++;
+    } else if (char.match(/\r/)) {
+        scanner.line++;
+        scanner.col = 1;
     }
     return scanner;
-}, { token: { val: ``, line: 1, col: 1 }, tokens: [], line: 1, col: 1 });
+}, { token: { val: '', line: 1, col: 1 }, tokens: [], line: 1, col: 1 });
 
 /*
 
