@@ -7,7 +7,7 @@ relationships
 
 encapsulants
 {} left encapsulates right or whatever is inside
-'' inside is text
+'' string
 
 definition
 : right defines left
