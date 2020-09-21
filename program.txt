@@ -2,12 +2,16 @@ science {physics, chemistry, biology}
 
 biology {plants}
 
-plants -capable of> photosynthesis
+plants -'capable of'> photosynthesis
 
 photosynthesis {
-        carbon_fixation,
-        reduction_phase,
-        carbohydrate_formation,
-        regeneration_formation,
-        carbon_fixation,
+        - description: 'A chemical process which converts sunlight into nutrition.', 
+        - discovered_by: john_smith,
+        - process: {
+                carbon_fixation ->
+                reduction_phase ->
+                carbohydrate_formation ->
+                regeneration_formation ->
+                carbon_fixation
+        }
 }
