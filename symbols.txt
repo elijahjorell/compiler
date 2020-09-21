@@ -1,6 +1,5 @@
 characteristics
 - information bullet point (consider whatever is right of it as text UNLESS right of it's a single word followed by a {})
-# tag
 
 relationships
 -- undirected relationship

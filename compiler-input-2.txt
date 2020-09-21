@@ -2,7 +2,7 @@ science {physics, chemistry, biology}
 
 biology {plants}
 
-plants -R.capable_of> photosynthesis
+plants -capable of> photosynthesis
 
 photosynthesis {
         carbon_fixation,
