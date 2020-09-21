@@ -11,9 +11,11 @@ class Lexer {
         this.tokens = [];
         this.line = 1; 
         this.col = 1;
+        this.skipIdentifierUpdate = false;
         this.grammar = [
             { regEx: /[a-z]/i   , type: 'ALPHA'},
             { regEx: /}/        , type: 'CLOSED_CURLY_BRACKET'},
+            { regEx: /:/        , type: 'COLON'},
             { regEx: /,/        , type: 'COMMA'},
             { regEx: />/        , type: 'GREATER_THAN'},
             { regEx: /-/        , type: 'HYPHEN'},
@@ -23,14 +25,6 @@ class Lexer {
             { regEx: /\r/       , type: 'RETURN'}, 
             { regEx: / /        , type: 'WHITE_SPACE'},
         ];
-        this.identifiers = [
-            'ALPHA',
-            'OPEN_CURLY_BRACKET',
-            'HYPHEN',
-            'HYPHEN_QUOTATION',
-            'HYPHEN_QUOTATION_QUOTATION',
-            'HYPHEN_QUOTATION_QUOTATION_COMPLETE'
-        ]
     }
     identify(char) {
         for (var i = this.grammar.length - 1; i >= 0; i--) {
@@ -42,13 +36,12 @@ class Lexer {
     lex(program) {
         program.split('').map((char) => {
             var identifiedChar = this.identify(char);
+
             if (this.token.val === '' && 
                 identifiedChar !== 'WHITE_SPACE' &&
                 identifiedChar !== 'NEW_LINE' &&
                 identifiedChar !== 'RETURN') {
-                this.token.idf = identifiedChar;
-                this.token.line = this.line;
-                this.token.col = this.col;
+                this.tokenSetIdentifier(identifiedChar);
                 this.tokenAddChar(char);
             } else {
                 if (this.token.idf === 'ALPHA') {
@@ -56,47 +49,80 @@ class Lexer {
                         case 'ALPHA':
                             this.nextCol();
                             break;
+                        case 'CLOSED_CURLY_BRACKET':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
                         case 'COMMA':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break;                
                         case 'OPEN_CURLY_BRACKET':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break;
                         case 'RETURN':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextLine();
                             break;
                         case 'WHITE_SPACE':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
-                            break; 
+                            break;
+                    }
+                } else if (this.token.idf === 'CLOSED_CURLY_BRACKET') {
+                    switch (identifiedChar) {
+                        case 'RETURN':
+                            this.tokenStore();
+                            this.nextLine();
+                            break;
+                    }
+                } else if (this.token.idf === 'COLON') {
+                    switch (identifiedChar) {
+                        case 'ALPHA':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
+                        case 'QUOTATION':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
+                        case 'WHITE_SPACE':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
+                    }
+                } else if (this.token.idf === 'COMMA') {
+                    switch (identifiedChar) {
+                        case 'ALPHA':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
+                        case 'WHITE_SPACE':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
+                        case 'RETURN':
+                            this.tokenStore();
+                            this.nextLine();
+                            break;
                     }
                 } else if (this.token.idf === 'OPEN_CURLY_BRACKET') {
                     switch (identifiedChar) {
                         case 'ALPHA':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break;            
                         case 'HYPHEN':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break;
                         case 'RETURN':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextLine();
                             break;
                         case 'WHITE_SPACE':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break; 
                     }
@@ -104,7 +130,6 @@ class Lexer {
                     switch (identifiedChar) {
                         case 'ALPHA':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break; 
                         case 'GREATER_THAN':
@@ -114,34 +139,40 @@ class Lexer {
                             this.nextCol();
                             break;                        
                         case 'QUOTATION':
+                            this.skipIdentifierUpdate = true;
+                            this.token.idf = 'HYPHEN_QUOTATION';
                             this.nextCol();
                             break;
                         case 'WHITE_SPACE':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break;
                     }
                 } else if (this.token.idf === 'HYPHEN_QUOTATION') {
                     switch (identifiedChar) {
                         case 'ALPHA':
+                            this.skipIdentifierUpdate = true;
                             this.nextCol();
                             break;               
                         case 'QUOTATION':
+                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION_QUOTATION';
                             this.nextCol();
                             break;
                         case 'WHITE_SPACE':
+                            this.skipIdentifierUpdate = true;
                             this.nextCol();
                             break;
                     }
                 } else if (this.token.idf === 'HYPHEN_QUOTATION_QUOTATION') {
                     switch (identifiedChar) {
                         case 'GREATER_THAN':
+                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION_QUOTATION_COMPLETE';
                             this.nextCol();
                             break;                 
                         case 'HYPHEN':
+                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION_QUOTATION_COMPLETE';
                             this.nextCol();
                             break;
@@ -150,17 +181,14 @@ class Lexer {
                     switch (identifiedChar) {
                         case 'ALPHA':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break;         
                         case 'RETURN':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextLine();
                             break;
                         case 'WHITE_SPACE':
                             this.tokenStore();
-                            this.tokenReset();
                             this.nextCol();
                             break; 
                     }
@@ -169,11 +197,15 @@ class Lexer {
                 if (identifiedChar !== 'WHITE_SPACE' &&
                     identifiedChar !== 'NEW_LINE' &&
                     identifiedChar !== 'RETURN') {
-                    this.token.idf = identifiedChar;
+                    if (this.skipIdentifierUpdate) {
+                        this.skipIdentifierUpdate = false;
+                    } else {
+                        this.tokenSetIdentifier(identifiedChar);
+                    }
                     this.tokenAddChar(char);
                 }
             }
-            console.log(this.token.idf, this.token.val);
+            console.log(this.token);
         });
         return this;
     }
@@ -193,8 +225,14 @@ class Lexer {
         this.token.col = undefined;
         this.token.val = '';
     }
+    tokenSetIdentifier(identifiedChar) {
+        this.token.idf = identifiedChar;
+        this.token.line = this.line;
+        this.token.col = this.col;
+    }
     tokenStore() {
         this.tokens.push(this.token);
+        this.tokenReset();
     }
 }
 
