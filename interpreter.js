@@ -4,19 +4,53 @@ const fs = require('fs');
 
 var program = fs.readFileSync('./program.txt', 'utf-8');
 
+const grammar = {
+    alpha: /_|[a-z]/i
+}
+
 program.split('').reduce((scanner, char) => {
-    if (char.match(/[ -{}',>]/)) {
-        console.log('special', char, scanner.line, scanner.col);
-        scanner.col++;
-    } else if (char.match(/[a-z]|_/)) {
-        console.log('alpha', char, scanner.line, scanner.col);
+    if (!char.match(/\r|\n/)) {
+        if (scanner.token.identifier === '' && char !== ' ') {
+            scanner.token.identifier += char;
+            scanner.token.val += char;
+        } else {
+            // Grammar
+            if (scanner.token.identifier.match(grammar.alpha)) {
+                if (char.match(grammar.alpha)) {
+                    scanner.token.val += char;
+                } else if (char === '{' || char === ' ' || char === '-') {
+                    scanner.token.val = '';
+                    scanner.token.identifier = '';
+                    if (char !== ' ') {
+                        scanner.token.val += char;
+                    }
+                } else {
+                    // return console.log('error', scanner.line, scanner.col);
+                }
+            } else if (scanner.token.identifier === '{') {
+                if (char.match(grammar.alpha) || char === '-') {
+                    scanner.token.val = '';
+                    scanner.token.identifier = '';
+                    if (char !== ' ') {
+                        scanner.token.val += char;
+                    }
+                } else {
+                    
+                }
+            }
+        }
+
+
+        console.log(scanner.token.val)
         scanner.col++;
     } else if (char.match(/\r/)) {
+        
         scanner.line++;
         scanner.col = 1;
     }
+    
     return scanner;
-}, { token: { val: '', line: 1, col: 1 }, tokens: [], line: 1, col: 1 });
+}, { token: { identifier: '', val: '', line: 1, col: 1 }, tokens: [], line: 1, col: 1 });
 
 /*
 

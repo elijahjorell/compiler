@@ -14,4 +14,4 @@ photosynthesis {
                 regeneration_formation ->
                 carbon_fixation
         }
-}BBBB
+}
