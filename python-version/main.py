@@ -1,7 +1,13 @@
-from lexer import Lexer
+import lexer
+import os
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
-program = open('program.txt', 'r').read()
+program_path = 'program.txt'
 
-lexer = Lexer(program)
+program = open(program_path, 'r').read()
 
-lexer.lex()
+result, error = lexer.run(program, program_path)
+
+if error: print(error.as_string())
+else: pp.pprint(result)
