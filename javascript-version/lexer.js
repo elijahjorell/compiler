@@ -13,7 +13,7 @@ class Lexer {
         this.col = 1;
         this.skipIdentifierUpdate = false;
         this.grammar = [
-            { regEx: /[a-z]/i   , type: 'ALPHA'},
+            { regEx: /_|[a-z]/i , type: 'ALPHA'},
             { regEx: /}/        , type: 'CLOSED_CURLY_BRACKET'},
             { regEx: /:/        , type: 'COLON'},
             { regEx: /,/        , type: 'COMMA'},
@@ -48,18 +48,31 @@ class Lexer {
                     switch (identifiedChar) {
                         case 'ALPHA':
                             this.nextCol();
+                            this.tokenAddChar(char);
                             break;
                         case 'CLOSED_CURLY_BRACKET':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;
+                        case 'COLON':
+                            this.tokenStore();
+                            this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
+                            break;  
                         case 'COMMA':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;                
                         case 'OPEN_CURLY_BRACKET':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;
                         case 'RETURN':
                             this.tokenStore();
@@ -82,10 +95,14 @@ class Lexer {
                         case 'ALPHA':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;
                         case 'QUOTATION':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;
                         case 'WHITE_SPACE':
                             this.tokenStore();
@@ -97,6 +114,8 @@ class Lexer {
                         case 'ALPHA':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;
                         case 'WHITE_SPACE':
                             this.tokenStore();
@@ -112,10 +131,14 @@ class Lexer {
                         case 'ALPHA':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;            
                         case 'HYPHEN':
                             this.tokenStore();
                             this.nextCol();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
                             break;
                         case 'RETURN':
                             this.tokenStore();
@@ -133,14 +156,18 @@ class Lexer {
                             this.nextCol();
                             break; 
                         case 'GREATER_THAN':
+                            this.token.idf = 'HYPHEN_GREATER_THAN';
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;                 
                         case 'HYPHEN':
+                            this.token.idf = 'HYPHEN_HYPHEN';
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;                        
                         case 'QUOTATION':
-                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION';
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;
                         case 'WHITE_SPACE':
@@ -148,32 +175,62 @@ class Lexer {
                             this.nextCol();
                             break;
                     }
+                } else if (this.token.idf === 'HYPHEN_GREATER_THAN') {
+                    switch (identifiedChar) {
+                        case 'ALPHA':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;         
+                        case 'RETURN':
+                            this.tokenStore();
+                            this.nextLine();
+                            break;
+                        case 'WHITE_SPACE':
+                            this.tokenStore();
+                            this.nextCol();
+                            break; 
+                    }
+                } else if (this.token.idf === 'HYPHEN_HYPHEN') {
+                    switch (identifiedChar) {
+                        case 'ALPHA':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;         
+                        case 'RETURN':
+                            this.tokenStore();
+                            this.nextLine();
+                            break;
+                        case 'WHITE_SPACE':
+                            this.tokenStore();
+                            this.nextCol();
+                            break; 
+                    }
                 } else if (this.token.idf === 'HYPHEN_QUOTATION') {
                     switch (identifiedChar) {
                         case 'ALPHA':
-                            this.skipIdentifierUpdate = true;
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;               
                         case 'QUOTATION':
-                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION_QUOTATION';
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;
                         case 'WHITE_SPACE':
-                            this.skipIdentifierUpdate = true;
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;
                     }
                 } else if (this.token.idf === 'HYPHEN_QUOTATION_QUOTATION') {
                     switch (identifiedChar) {
                         case 'GREATER_THAN':
-                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION_QUOTATION_COMPLETE';
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;                 
                         case 'HYPHEN':
-                            this.skipIdentifierUpdate = true;
                             this.token.idf = 'HYPHEN_QUOTATION_QUOTATION_COMPLETE';
+                            this.tokenAddChar(char);
                             this.nextCol();
                             break;
                     }
@@ -192,22 +249,45 @@ class Lexer {
                             this.nextCol();
                             break; 
                     }
-                }
-
-                if (identifiedChar !== 'WHITE_SPACE' &&
-                    identifiedChar !== 'NEW_LINE' &&
-                    identifiedChar !== 'RETURN') {
-                    if (this.skipIdentifierUpdate) {
-                        this.skipIdentifierUpdate = false;
-                    } else {
-                        this.tokenSetIdentifier(identifiedChar);
+                } else if (this.token.idf === 'QUOTATION') {
+                    switch (identifiedChar) {
+                        case 'ALPHA':
+                            this.tokenAddChar(char);
+                            this.nextCol();
+                            break;
+                        case 'QUOTATION':
+                            this.token.idf = 'QUOTATION_QUOTATION';
+                            this.tokenAddChar(char);
+                            this.nextCol();
+                            break;
+                        case 'WHITE_SPACE':
+                            this.tokenAddChar(char);
+                            this.nextCol();
+                            break;
                     }
-                    this.tokenAddChar(char);
+                } else if (this.token.idf === 'QUOTATION_QUOTATION') {
+                    switch (identifiedChar) {
+                        case 'COMMA':
+                            this.tokenStore();
+                            this.tokenSetIdentifier(identifiedChar);
+                            this.tokenAddChar(char);
+                            this.nextCol();
+                            break;                
+                        case 'RETURN':
+                            this.tokenStore();
+                            this.nextLine();
+                            break;
+                        case 'WHITE_SPACE':
+                            this.tokenStore();
+                            this.nextCol();
+                            break;
+                    }
                 }
             }
-            console.log(this.token);
+            // console.log(this.token);
         });
-        return this;
+        this.tokenStore();
+        return this.tokens;
     }
     nextCol() {
         this.col++;
@@ -232,6 +312,7 @@ class Lexer {
     }
     tokenStore() {
         this.tokens.push(this.token);
+        console.log(this.token);
         this.tokenReset();
     }
 }

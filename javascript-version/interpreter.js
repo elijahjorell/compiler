@@ -4,5 +4,6 @@ const program = fs.readFileSync('./program.txt', 'utf-8');
 
 const lexer = new Lexer();
 
-lexer.lex(program);
+console.log(lexer.lex(program));
+
 
