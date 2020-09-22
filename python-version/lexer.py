@@ -19,7 +19,7 @@ class Token:
         self.value = value
     
     def __repr__(self):
-        if self.value: return f'{self.type}:{self.value}'
+        if self.value: return f'{self.type}: {self.value}'
         return f'{self.type}'
 
 class Lexer:
@@ -30,6 +30,7 @@ class Lexer:
         self.advance()
     
     def advance(self):
+        # print(self.curr_char)
         self.pos += 1
         self.curr_char = self.text[self.pos] if self.pos < len(self.text) else None
 
@@ -37,7 +38,7 @@ class Lexer:
         tokens = []
 
         while self.curr_char != None:
-            if self.curr_char in ' \t':
+            if self.curr_char in ' \t\n':
                 self.advance()
             elif self.curr_char == '{':
                 tokens.append(Token(TOKEN_L_BRACE))
@@ -55,21 +56,50 @@ class Lexer:
                 tokens.append(self.make_relationship())
                 self.advance()
             elif self.curr_char == "'":
-                tokens.append(self.make_string())
+                tokens.append(Token(TOKEN_STRING, self.make_string()))
                 self.advance()
             elif re.match('[_a-zA-Z]', self.curr_char):
-                tokens.append(self.make_node())
-                self.advance()
-            
+                tokens.append(Token(TOKEN_NODE, self.make_node()))
+                # self.advance()
 
+        print(tokens)
+                
     def make_string(self):
-        
-        pass
+        string = ''
+        self.advance()
+
+        while self.curr_char != "'":
+            string += self.curr_char
+            self.advance()
+
+        return string
 
     def make_relationship(self):
-        pass
+        self.advance()
+
+        if self.curr_char == '-':
+            return Token(TOKEN_UNDIR_REL)
+        elif self.curr_char == '>':
+            return Token(TOKEN_DIR_REL)
+        elif self.curr_char == "'":
+            description = self.make_string()
+            self.advance()
+            if (self.curr_char == '-'):
+                return Token(TOKEN_UNDIR_REL_DSCRBD, description)
+            elif (self.curr_char == '>'):
+                return Token(TOKEN_DIR_REL_DSCRBD, description)
+
+        return Token(TOKEN_ATTRIB)
 
     def make_node(self):
-        pass
+        node = self.curr_char
+        self.advance()
+
+        while re.match('[_a-zA-Z]', self.curr_char):
+            node += self.curr_char
+            self.advance()
+
+        return node
+
 
     
