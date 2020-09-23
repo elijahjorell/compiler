@@ -1,17 +1,18 @@
 import re
 
-TOKEN_L_BRACE = 'LBRACE'
-TOKEN_R_BRACE = 'RBRACE'
-TOKEN_COMMA = 'COMMA'
-TOKEN_COLON = 'COLON'
+TT_L_BRACE = 'LBRACE'
+TT_R_BRACE = 'RBRACE'
+TT_COMMA = 'COMMA'
+TT_COLON = 'COLON'
+TT_NEWLINE = 'NEWLINE'
 
-TOKEN_NODE = 'NODE'
-TOKEN_STRING = 'STRING'
-TOKEN_ATTRIB = 'ATTRIB'
-TOKEN_UNDIR_REL = 'UNDIR_REL'
-TOKEN_UNDIR_REL_DSCRBD = 'UNDIR_REL_DSCRBD'
-TOKEN_DIR_REL = 'DIR_REL'
-TOKEN_DIR_REL_DSCRBD = 'DIR_REL_DSCRBD'
+TT_IDENTIFIER = 'IDENTIFIER'
+TT_STRING = 'STRING'
+TT_ATTRIB = 'ATTRIB'
+TT_UNDIR_REL = 'UNDIR_REL'
+TT_UNDIR_REL_DSCRBD = 'UNDIR_REL_DSCRBD'
+TT_DIR_REL = 'DIR_REL'
+TT_DIR_REL_DSCRBD = 'DIR_REL_DSCRBD'
 
 class Token:
     def __init__(self, type_, value=None):
@@ -77,28 +78,31 @@ class Lexer:
         tokens = []
 
         while self.curr_char != None:
-            if self.curr_char in ' \t\n':
+            if self.curr_char in ' \t':
+                self.advance()
+            elif self.curr_char in '\n':
+                tokens.append(Token(TT_NEWLINE))
                 self.advance()
             elif self.curr_char == '{':
-                tokens.append(Token(TOKEN_L_BRACE))
+                tokens.append(Token(TT_L_BRACE))
                 self.advance()
             elif self.curr_char == '}':
-                tokens.append(Token(TOKEN_R_BRACE))
+                tokens.append(Token(TT_R_BRACE))
                 self.advance()
             elif self.curr_char == ',':
-                tokens.append(Token(TOKEN_COMMA))
+                tokens.append(Token(TT_COMMA))
                 self.advance()
             elif self.curr_char == ':':
-                tokens.append(Token(TOKEN_COLON))
+                tokens.append(Token(TT_COLON))
                 self.advance()
             elif self.curr_char == '-':
                 tokens.append(self.make_relationship())
                 self.advance()
             elif self.curr_char == "'":
-                tokens.append(Token(TOKEN_STRING, self.make_string()))
+                tokens.append(Token(TT_STRING, self.make_string()))
                 self.advance()
             elif re.match('[_a-zA-Z]', self.curr_char):
-                tokens.append(Token(TOKEN_NODE, self.make_node()))
+                tokens.append(Token(TT_IDENTIFIER, self.make_identifier()))
             else:
                 pos_start = self.pos.copy()
                 char = self.curr_char
@@ -121,28 +125,38 @@ class Lexer:
         self.advance()
 
         if self.curr_char == '-':
-            return Token(TOKEN_UNDIR_REL)
+            return Token(TT_UNDIR_REL)
         elif self.curr_char == '>':
-            return Token(TOKEN_DIR_REL)
+            return Token(TT_DIR_REL)
         elif self.curr_char == "'":
             description = self.make_string()
             self.advance()
             if (self.curr_char == '-'):
-                return Token(TOKEN_UNDIR_REL_DSCRBD, description)
+                return Token(TT_UNDIR_REL_DSCRBD, description)
             elif (self.curr_char == '>'):
-                return Token(TOKEN_DIR_REL_DSCRBD, description)
+                return Token(TT_DIR_REL_DSCRBD, description)
 
-        return Token(TOKEN_ATTRIB)
+        return Token(TT_ATTRIB)
 
-    def make_node(self):
-        node = self.curr_char
+    def make_identifier(self):
+        identifier = self.curr_char
         self.advance()
 
         while re.match('[_a-zA-Z]', self.curr_char):
-            node += self.curr_char
+            identifier += self.curr_char
             self.advance()
 
-        return node
+        return identifier
+
+class IdentifierNode:
+    def __init__(self, token):
+        self.token = token
+
+    def __repr__(self):
+        return f'{self.token}'
+
+class Parser:
+    def __init__(self, tokens)
 
 def run(text, file_name):
     lexer = Lexer(text, file_name)
