@@ -15,10 +15,3 @@ photosynthesis {
                 carbon_fixation
         }
 }
-
-elijah
-vanessa
-
-elijah {
-
-}

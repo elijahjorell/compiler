@@ -6,13 +6,11 @@ TT_COMMA = 'COMMA'
 TT_COLON = 'COLON'
 TT_NEWLINE = 'NEWLINE'
 
-TT_IDENTIFIER = 'IDENTIFIER'
+TT_ID = 'ID'
 TT_STRING = 'STRING'
 TT_ATTRIB = 'ATTRIB'
 TT_UNDIR_REL = 'UNDIR_REL'
-TT_UNDIR_REL_DSCRBD = 'UNDIR_REL_DSCRBD'
 TT_DIR_REL = 'DIR_REL'
-TT_DIR_REL_DSCRBD = 'DIR_REL_DSCRBD'
 
 class Token:
     def __init__(self, type_, value=None):
@@ -102,7 +100,7 @@ class Lexer:
                 tokens.append(Token(TT_STRING, self.make_string()))
                 self.advance()
             elif re.match('[_a-zA-Z]', self.curr_char):
-                tokens.append(Token(TT_IDENTIFIER, self.make_identifier()))
+                tokens.append(Token(TT_ID, self.make_id()))
             else:
                 pos_start = self.pos.copy()
                 char = self.curr_char
@@ -132,32 +130,25 @@ class Lexer:
             description = self.make_string()
             self.advance()
             if (self.curr_char == '-'):
-                return Token(TT_UNDIR_REL_DSCRBD, description)
+                return Token(TT_UNDIR_REL, description)
             elif (self.curr_char == '>'):
-                return Token(TT_DIR_REL_DSCRBD, description)
+                return Token(TT_DIR_REL, description)
 
         return Token(TT_ATTRIB)
 
-    def make_identifier(self):
-        identifier = self.curr_char
+    def make_id(self):
+        ID = self.curr_char
         self.advance()
 
         while re.match('[_a-zA-Z]', self.curr_char):
-            identifier += self.curr_char
+            ID += self.curr_char
             self.advance()
 
-        return identifier
-
-class IdentifierNode:
-    def __init__(self, token):
-        self.token = token
-
-    def __repr__(self):
-        return f'{self.token}'
+        return ID
 
 class Parser:
     def __init__(self, tokens):
-        pass
+        self.tokens = tokens
 
     def parse(self):
         return None
@@ -169,7 +160,5 @@ def run(text, file_name):
 
     parser = Parser(tokens)
     ast = parser.parse()
-
-    print(ast)
 
     return tokens, error
