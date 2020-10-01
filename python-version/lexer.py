@@ -5,7 +5,7 @@ TOKEN_R_BRACE = 'RBRACE'
 TOKEN_COMMA = 'COMMA'
 TOKEN_COLON = 'COLON'
 
-TOKEN_NODE = 'NODE'
+TOKEN_ID = 'ID'
 TOKEN_STRING = 'STRING'
 TOKEN_ATTRIB = 'ATTRIB'
 TOKEN_UNDIR_REL = 'UNDIR_REL'
@@ -98,7 +98,7 @@ class Lexer:
                 tokens.append(Token(TOKEN_STRING, self.make_string()))
                 self.advance()
             elif re.match('[_a-zA-Z]', self.curr_char):
-                tokens.append(Token(TOKEN_NODE, self.make_node()))
+                tokens.append(Token(TOKEN_ID, self.make_id()))
             else:
                 pos_start = self.pos.copy()
                 char = self.curr_char
@@ -134,18 +134,48 @@ class Lexer:
 
         return Token(TOKEN_ATTRIB)
 
-    def make_node(self):
-        node = self.curr_char
+    def make_id(self):
+        id_str = self.curr_char
         self.advance()
 
         while re.match('[_a-zA-Z]', self.curr_char):
-            node += self.curr_char
+            id_str += self.curr_char
             self.advance()
 
-        return node
+        return id_str
+
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.idx = 1
+        self.curr_token = None
+        self.advance()
+
+    def advance(self):
+        self.idx += 1
+        if self.idx < len(self.tokens):
+            self.curr_token = self.tokens[self.idx]
+        return self.curr_token
+
+    def term(self):
+        token = self.curr_token
+
+        if token.type == TOKEN_ID:
+            
+            self.advance()
+            return 
+
+    def parse(self):
+        wil
 
 def run(text, file_name):
     lexer = Lexer(text, file_name)
     tokens, error = lexer.lex()
+    if error: return None, error
+
+    parser = Parser(tokens)
+    ast = parser.parse()
+
+    print(ast)
 
     return tokens, error
