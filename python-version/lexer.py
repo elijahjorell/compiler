@@ -6,11 +6,14 @@ TT_COMMA = 'COMMA'
 TT_COLON = 'COLON'
 TT_NEWLINE = 'NEWLINE'
 
-TT_ID = 'ID'
+TT_IDENTI = 'IDENTI'
 TT_STRING = 'STRING'
 TT_ATTRIB = 'ATTRIB'
 TT_UNDIR_REL = 'UNDIR_REL'
+TT_UNDIR_REL_DSCRBD = 'UNDIR_REL_DSCRBD'
 TT_DIR_REL = 'DIR_REL'
+
+TT_EOF = 'EOF'
 
 class Token:
     def __init__(self, type_, value=None):
@@ -100,13 +103,14 @@ class Lexer:
                 tokens.append(Token(TT_STRING, self.make_string()))
                 self.advance()
             elif re.match('[_a-zA-Z]', self.curr_char):
-                tokens.append(Token(TT_ID, self.make_id()))
+                tokens.append(Token(TT_IDENTI, self.make_identi()))
             else:
                 pos_start = self.pos.copy()
                 char = self.curr_char
                 self.advance()
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
 
+        tokens.append(Token(TT_EOF))
         return tokens, None
                 
     def make_string(self):
@@ -136,22 +140,37 @@ class Lexer:
 
         return Token(TT_ATTRIB)
 
-    def make_id(self):
-        ID = self.curr_char
+    def make_identi(self):
+        identi = self.curr_char
         self.advance()
 
         while re.match('[_a-zA-Z]', self.curr_char):
-            ID += self.curr_char
+            identi += self.curr_char
             self.advance()
 
-        return ID
+        return identi
 
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
+        self.idx = -1
+        self.curr_token = None
+        self.advance()
+
+    def advance(self):
+        self.idx += 1
+        if self.idx < len(self.tokens):
+            self.curr_token = self.tokens[self.idx]
+        return self.curr_token
 
     def parse(self):
-        return None
+        while self.curr_token.type != TT_EOF:
+            print(self.curr_token)
+            self.advance()
+        return []
+
+    def expr(self):
+        pass
 
 def run(text, file_name):
     lexer = Lexer(text, file_name)
@@ -161,4 +180,4 @@ def run(text, file_name):
     parser = Parser(tokens)
     ast = parser.parse()
 
-    return tokens, error
+    return ast, error

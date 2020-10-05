@@ -1,3 +1,16 @@
-expr    : ID
-        : ID 
+sequence    : ID ((DIR_REL|UN_DIR_REL) ID)*
 
+attribution : ID COLON (ID|STRING)
+
+batch_term  : ID
+            : sequence
+            : batch
+            : attribution
+
+batch       : ID LBRACE (batch_term|(batch_term (COMMA batch_term)*)) RBRACE
+
+expr        : ID NEWLINE
+            : sequence NEWLINE
+            : batch NEWLINE
+
+// batch has root, sequence does not have root

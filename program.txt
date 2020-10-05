@@ -1,6 +1,10 @@
-science {physics, chemistry, biology}
+science {
+        physics,
+        chemistry,
+        biology
+}
 
-biology {plants}
+biology {plants, animals}
 
 plants -'capable of'> photosynthesis
 
@@ -15,3 +19,4 @@ photosynthesis {
                 carbon_fixation
         }
 }
+
