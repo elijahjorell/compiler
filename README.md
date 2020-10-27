@@ -1,3 +1,3 @@
 # Interpreter
 
-# This project aims to create a interpreter for a language which stores knowledge in a network of nodes
+## This project aims to develop a note-taking language which store knowledge as a network of nodes with individual attributes.
